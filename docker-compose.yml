@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: multi_tenant_workflow_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build: ./server
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:root@postgres:5432/multi_tenant_workflow_db
+      JWT_SECRET: jwt_secret
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:  # For hot reload in dev
+      - ./server/src:/app/src
+    # command: sh -c "npm run migrate && npm run seed && npm run dev"  # Use dev in development
+
+  client:
+    build: ./client
+    ports:
+      - "5173:80"  # Adjust if using dev server
+    depends_on:
+      - server
+
+volumes:
+  pg_data:
