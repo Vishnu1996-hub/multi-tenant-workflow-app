@@ -5,6 +5,16 @@ import { config } from '../config';
 import { TenantRole } from '../modules/tenants/tenants.types';
 import { prisma } from '../db';
 
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: string;
+      tenantId?: string;
+      tenantRole?: TenantRole;
+    }
+  }
+}
+
 type JwtPayload = {
   userId: string;
 };
@@ -48,18 +58,4 @@ export function requireTenantAccess(roles?: TenantRole[]) {
       next(error);
     }
   };
-}
-
-export function requireAdmin(req: Request, _res: Response, next: NextFunction): void {
-  try {
-    if (!req.tenantRole) {
-      throw new AppError('Tenant context not found', 403);
-    }
-    if (req.tenantRole !== 'admin') {
-      throw new AppError('Admin access required', 403);
-    }
-    next();
-  } catch (error) {
-    next(error);
-  }
 }

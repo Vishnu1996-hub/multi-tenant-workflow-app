@@ -41,6 +41,7 @@ export async function getProfile(
   res: Response,
   next: NextFunction
 ) {
+  console.log('Getting profile for userId:', req.userId);
   try {
     const user = await authService.getProfile(req.userId!);
 
