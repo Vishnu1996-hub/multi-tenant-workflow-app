@@ -1,17 +1,13 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
+import app from './app';
+import { config } from './config';
+import { connectDB } from './db';
 
-const app = express();
+async function bootstrap() {
+  await connectDB();
 
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
+  app.listen(config.port, () => {
+    console.log(`Backend running on port ${config.port}`);
+  });
+}
 
-// Health check
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Backend running on ${PORT}`));
+bootstrap();
