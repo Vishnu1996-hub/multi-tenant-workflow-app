@@ -1,15 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodObject } from 'zod';
+import { ZodTypeAny } from 'zod';
+
+type ValidationTarget = 'body' | 'query' | 'params';
 
 export const validate =
-  (schema: ZodObject) =>
+  (schema: ZodTypeAny, target: ValidationTarget = 'body') =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await schema.parse({
-        body: req.body,
-        query: req.query,
-        params: req.params,
-      });
+      await schema.parseAsync(req[target]);
       next();
     } catch (error: any) {
       console.log('Validation Error:', error);

@@ -17,6 +17,7 @@ model User {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   memberships TenantMembership[]
+  createdWorkflows Workflow[] @relation("Workflow_creator")
 
   @@map("users")
 }
@@ -36,6 +37,9 @@ model Tenant {
   updatedAt   DateTime           @updatedAt @map("updated_at")
 
   memberships TenantMembership[]
+  workflows        Workflow[]
+  workflowStates   WorkflowState[]
+  workflowTransitions WorkflowTransition[]
 
   @@map("tenants")
 }
@@ -53,4 +57,80 @@ model TenantMembership {
 
   @@unique([tenantId, userId])
   @@map("tenant_memberships")
+}
+
+enum ApprovalStrategy {
+  none
+  single
+  all
+  quorum
+}
+
+model Workflow {
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  name        String   @db.VarChar(255)
+  description String?
+  version     Int      @default(1)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdBy   String   @map("created_by") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  tenant      Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator     User                  @relation("Workflow_creator", fields: [createdBy], references: [id])
+  states      WorkflowState[]
+  transitions WorkflowTransition[]
+
+  @@index([tenantId])
+  @@map("workflows")
+}
+
+model WorkflowState {
+  id           String   @id @default(uuid()) @db.Uuid
+  workflowId   String   @map("workflow_id") @db.Uuid
+  tenantId     String   @map("tenant_id") @db.Uuid
+  name         String   @db.VarChar(100)
+  description  String?
+  isInitial    Boolean  @default(false) @map("is_initial")
+  isTerminal   Boolean  @default(false) @map("is_terminal")
+  positionOrder Int     @default(0) @map("position_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  workflow     Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  fromTransitions WorkflowTransition[] @relation("FromState")
+  toTransitions   WorkflowTransition[] @relation("ToState")
+
+  @@unique([workflowId, name])
+  @@index([workflowId])
+  @@index([tenantId])
+  @@map("workflow_states")
+}
+
+model WorkflowTransition {
+  id               String            @id @default(uuid()) @db.Uuid
+  workflowId       String            @map("workflow_id") @db.Uuid
+  tenantId         String            @map("tenant_id") @db.Uuid
+  fromStateId      String            @map("from_state_id") @db.Uuid
+  toStateId        String            @map("to_state_id") @db.Uuid
+  name             String?           @db.VarChar(100)
+  requiresApproval Boolean           @default(false) @map("requires_approval")
+  approvalStrategy ApprovalStrategy  @default(none) @map("approval_strategy")
+  quorumCount      Int?              @map("quorum_count")
+  allowedRoles     TenantRole[]      @map("allowed_roles")
+  createdAt        DateTime          @default(now()) @map("created_at")
+
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  fromState WorkflowState @relation("FromState", fields: [fromStateId], references: [id], onDelete: Cascade)
+  toState   WorkflowState @relation("ToState", fields: [toStateId], references: [id], onDelete: Cascade)
+
+  @@unique([workflowId, fromStateId, toStateId])
+  @@index([workflowId])
+  @@index([fromStateId])
+  @@index([tenantId])
+  @@map("workflow_transitions")
 }
