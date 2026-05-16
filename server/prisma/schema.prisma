@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
@@ -16,8 +16,10 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  memberships TenantMembership[]
-  createdWorkflows Workflow[] @relation("Workflow_creator")
+  memberships      TenantMembership[]
+  createdWorkflows Workflow[]         @relation("Workflow_creator")
+  items            Item[]
+  approvalRequests ApprovalRequest[]
 
   @@map("users")
 }
@@ -30,16 +32,18 @@ enum TenantRole {
 }
 
 model Tenant {
-  id          String             @id @default(uuid()) @db.Uuid
-  name        String             @db.VarChar(255)
-  slug        String             @unique @db.VarChar(100)
-  createdAt   DateTime           @default(now()) @map("created_at")
-  updatedAt   DateTime           @updatedAt @map("updated_at")
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(255)
+  slug      String   @unique @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  memberships TenantMembership[]
-  workflows        Workflow[]
-  workflowStates   WorkflowState[]
+  memberships         TenantMembership[]
+  workflows           Workflow[]
+  workflowStates      WorkflowState[]
   workflowTransitions WorkflowTransition[]
+  items               Item[]
+  approvalRequests    ApprovalRequest[]
 
   @@map("tenants")
 }
@@ -77,31 +81,34 @@ model Workflow {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  tenant      Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  creator     User                  @relation("Workflow_creator", fields: [createdBy], references: [id])
+  tenant      Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator     User                 @relation("Workflow_creator", fields: [createdBy], references: [id])
   states      WorkflowState[]
   transitions WorkflowTransition[]
+  items       Item[]
 
   @@index([tenantId])
   @@map("workflows")
 }
 
 model WorkflowState {
-  id           String   @id @default(uuid()) @db.Uuid
-  workflowId   String   @map("workflow_id") @db.Uuid
-  tenantId     String   @map("tenant_id") @db.Uuid
-  name         String   @db.VarChar(100)
-  description  String?
-  isInitial    Boolean  @default(false) @map("is_initial")
-  isTerminal   Boolean  @default(false) @map("is_terminal")
-  positionOrder Int     @default(0) @map("position_order")
-  createdAt    DateTime @default(now()) @map("created_at")
+  id            String   @id @default(uuid()) @db.Uuid
+  workflowId    String   @map("workflow_id") @db.Uuid
+  tenantId      String   @map("tenant_id") @db.Uuid
+  name          String   @db.VarChar(100)
+  description   String?
+  isInitial     Boolean  @default(false) @map("is_initial")
+  isTerminal    Boolean  @default(false) @map("is_terminal")
+  positionOrder Int      @default(0) @map("position_order")
+  createdAt     DateTime @default(now()) @map("created_at")
 
-  workflow     Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   fromTransitions WorkflowTransition[] @relation("FromState")
   toTransitions   WorkflowTransition[] @relation("ToState")
+
+  items Item[]
 
   @@unique([workflowId, name])
   @@index([workflowId])
@@ -110,17 +117,17 @@ model WorkflowState {
 }
 
 model WorkflowTransition {
-  id               String            @id @default(uuid()) @db.Uuid
-  workflowId       String            @map("workflow_id") @db.Uuid
-  tenantId         String            @map("tenant_id") @db.Uuid
-  fromStateId      String            @map("from_state_id") @db.Uuid
-  toStateId        String            @map("to_state_id") @db.Uuid
-  name             String?           @db.VarChar(100)
-  requiresApproval Boolean           @default(false) @map("requires_approval")
-  approvalStrategy ApprovalStrategy  @default(none) @map("approval_strategy")
-  quorumCount      Int?              @map("quorum_count")
-  allowedRoles     TenantRole[]      @map("allowed_roles")
-  createdAt        DateTime          @default(now()) @map("created_at")
+  id               String           @id @default(uuid()) @db.Uuid
+  workflowId       String           @map("workflow_id") @db.Uuid
+  tenantId         String           @map("tenant_id") @db.Uuid
+  fromStateId      String           @map("from_state_id") @db.Uuid
+  toStateId        String           @map("to_state_id") @db.Uuid
+  name             String?          @db.VarChar(100)
+  requiresApproval Boolean          @default(false) @map("requires_approval")
+  approvalStrategy ApprovalStrategy @default(none) @map("approval_strategy")
+  quorumCount      Int?             @map("quorum_count")
+  allowedRoles     TenantRole[]     @map("allowed_roles")
+  createdAt        DateTime         @default(now()) @map("created_at")
 
   workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
   tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
@@ -128,9 +135,68 @@ model WorkflowTransition {
   fromState WorkflowState @relation("FromState", fields: [fromStateId], references: [id], onDelete: Cascade)
   toState   WorkflowState @relation("ToState", fields: [toStateId], references: [id], onDelete: Cascade)
 
+  approvalRequests ApprovalRequest[]
+
   @@unique([workflowId, fromStateId, toStateId])
   @@index([workflowId])
   @@index([fromStateId])
   @@index([tenantId])
   @@map("workflow_transitions")
+}
+
+model Item {
+  id             String @id @default(uuid()) @db.Uuid
+  tenantId       String @map("tenant_id") @db.Uuid
+  workflowId     String @map("workflow_id") @db.Uuid
+  currentStateId String @map("current_state_id") @db.Uuid
+  createdBy      String @map("created_by") @db.Uuid
+
+  title       String   @db.VarChar(500)
+  description String?
+  metadata    Json     @default("{}")
+  version     Int      @default(1)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  tenant           Tenant            @relation(fields: [tenantId], references: [id])
+  workflow         Workflow          @relation(fields: [workflowId], references: [id])
+  currentState     WorkflowState     @relation(fields: [currentStateId], references: [id])
+  creator          User              @relation(fields: [createdBy], references: [id])
+  approvalRequests ApprovalRequest[]
+
+  @@map("items")
+}
+
+enum ApprovalStatus {
+  pending
+  approved
+  rejected
+  cancelled
+  superseded
+
+  @@map("approval_status")
+}
+
+model ApprovalRequest {
+  id             String         @id @default(uuid()) @db.Uuid
+  tenantId       String         @map("tenant_id") @db.Uuid
+  itemId         String         @map("item_id") @db.Uuid
+  transitionId   String         @map("transition_id") @db.Uuid
+  requestedBy    String         @map("requested_by") @db.Uuid
+  status         ApprovalStatus @default(pending)
+  idempotencyKey String?        @map("idempotency_key")
+  resolvedAt     DateTime?      @map("resolved_at")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  tenant     Tenant             @relation(fields: [tenantId], references: [id])
+  item       Item               @relation(fields: [itemId], references: [id])
+  transition WorkflowTransition @relation(fields: [transitionId], references: [id])
+  requester  User               @relation(fields: [requestedBy], references: [id])
+
+  @@unique([tenantId, idempotencyKey])
+  @@index([itemId])
+  @@index([tenantId])
+  @@index([status])
+  @@map("approval_requests")
 }
