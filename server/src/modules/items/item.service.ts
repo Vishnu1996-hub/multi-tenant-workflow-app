@@ -78,7 +78,7 @@ export async function requestTransition(
      * 1. Idempotency check
      */
     if (idempotencyKey) {
-      const existing = await tx.approvalRequest.findFirst({
+      const existing = await tx.request.findFirst({
         where: {
           tenantId,
           idempotencyKey,
@@ -90,7 +90,7 @@ export async function requestTransition(
       });
 
       if (existing) {
-        return { approvalRequest: existing };
+        return { request: existing };
       }
     }
 
@@ -143,7 +143,7 @@ export async function requestTransition(
     /**
      * 6. Supersede previous pending approvals
      */
-    await tx.approvalRequest.updateMany({
+    await tx.request.updateMany({
       where: {
         itemId,
         status: 'pending',
@@ -158,7 +158,7 @@ export async function requestTransition(
      * 7. Approval flow
      */
     if (transition.requiresApproval) {
-      const approvalRequest = await tx.approvalRequest.create({
+      const request = await tx.request.create({
         data: {
           tenantId,
           itemId,
@@ -172,7 +172,7 @@ export async function requestTransition(
         },
       });
 
-      return { approvalRequest };
+      return { request };
     }
 
     /**
@@ -186,7 +186,7 @@ export async function requestTransition(
   });
 }
 
-type PerformTransitionParams = {
+export type PerformTransitionParams = {
   tenantId: string;
   item: {
     id: string;
@@ -197,7 +197,7 @@ type PerformTransitionParams = {
   };
 };
 
-async function performTransition({
+export async function performTransition({
   tenantId,
   item,
   transition,

@@ -20,7 +20,7 @@ export type RequestTransitionInput = {
 
 export type TransitionResponse = {
   item?: any;
-  approvalRequest?: {
+  request?: {
     id: string;
     status: string;
   };

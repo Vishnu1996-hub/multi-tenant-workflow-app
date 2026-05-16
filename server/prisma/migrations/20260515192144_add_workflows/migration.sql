@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "ApprovalStrategy" AS ENUM ('none', 'single', 'all', 'quorum');
+CREATE TYPE "RequestStrategy" AS ENUM ('none', 'single', 'all', 'quorum');
 
 -- CreateTable
 CREATE TABLE "workflows" (
@@ -40,7 +40,7 @@ CREATE TABLE "workflow_transitions" (
     "to_state_id" UUID NOT NULL,
     "name" VARCHAR(100),
     "requires_approval" BOOLEAN NOT NULL DEFAULT false,
-    "approval_strategy" "ApprovalStrategy" NOT NULL DEFAULT 'none',
+    "approval_strategy" "RequestStrategy" NOT NULL DEFAULT 'none',
     "quorum_count" INTEGER,
     "allowed_roles" "TenantRole"[],
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
