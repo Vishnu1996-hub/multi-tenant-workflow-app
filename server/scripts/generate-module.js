@@ -21,6 +21,7 @@ const files = [
   `${filePrefix}.repository.ts`,
   `${filePrefix}.schema.ts`,
   `${filePrefix}.types.ts`,
+  `${filePrefix}.utils.ts`,
 ];
 
 fs.mkdirSync(basePath, { recursive: true });
