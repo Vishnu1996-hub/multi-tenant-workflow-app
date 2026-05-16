@@ -20,6 +20,7 @@ model User {
   createdWorkflows Workflow[]         @relation("Workflow_creator")
   items            Item[]
   Requests         Request[]
+  auditLogs        AuditLog[]
 
   @@map("users")
 }
@@ -44,6 +45,7 @@ model Tenant {
   workflowTransitions WorkflowTransition[]
   items               Item[]
   Requests            Request[]
+  auditLogs           AuditLog[]
 
   @@map("tenants")
 }
@@ -200,4 +202,51 @@ model Request {
   @@index([tenantId])
   @@index([status])
   @@map("requests")
+}
+
+enum AuditAction {
+  user_registered            @map("user.registered")
+  user_logged_in             @map("user.logged_in")
+  tenant_created             @map("tenant.created")
+  tenant_membership_added    @map("tenant.membership_added")
+  tenant_membership_updated  @map("tenant.membership_updated")
+  workflow_created           @map("workflow.created")
+  workflow_updated           @map("workflow.updated")
+  workflow_state_added       @map("workflow.state_added")
+  workflow_transition_added  @map("workflow.transition_added")
+  item_created               @map("item.created")
+  item_transition_requested  @map("item.transition_requested")
+  item_transitioned          @map("item.transitioned")
+  approval_request_created   @map("approval_request.created")
+  approval_request_cancelled @map("approval_request.cancelled")
+  approval_vote_cast         @map("approval_vote.cast")
+  approval_request_resolved  @map("approval_request.resolved")
+  delegation_created         @map("delegation.created")
+  delegation_revoked         @map("delegation.revoked")
+
+  @@map("audit_action")
+}
+
+model AuditLog {
+  id          String      @id @default(uuid()) @db.Uuid
+  tenantId    String?     @map("tenant_id") @db.Uuid
+  actorId     String?     @map("actor_id") @db.Uuid
+  action      AuditAction
+  entityType  String?     @map("entity_type")
+  entityId    String?     @map("entity_id") @db.Uuid
+  beforeState Json?       @map("before_state")
+  afterState  Json?       @map("after_state")
+  metadata    Json        @default("{}")
+  ipAddress   String?     @map("ip_address") @db.Inet
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id])
+  actor  User?   @relation(fields: [actorId], references: [id])
+
+  @@index([tenantId])
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
 }
