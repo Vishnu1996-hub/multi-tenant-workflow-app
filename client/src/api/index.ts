@@ -1,4 +1,4 @@
-const BASE_URL = "/api";
+const BASE_URL = "http://localhost:3000/api";
 
 function getToken(): string | null {
   return localStorage.getItem("token");
@@ -78,7 +78,7 @@ export const authApi = {
       body: data,
     }),
   me: () =>
-    request<{ id: string; email: string; full_name: string }>("/auth/me"),
+    request<{ id: string; email: string; full_name: string }>("/auth/profile"),
 };
 
 // Tenants

@@ -29,7 +29,7 @@ services:
         condition: service_healthy
     volumes:  # For hot reload in dev
       - ./server/src:/app/src
-    # command: sh -c "npm run migrate && npm run seed && npm run dev"  # Use dev in development
+    command: sh -c "npm run migrate && npm run seed && npm run dev"  # Use dev in development
 
   client:
     build: ./client
