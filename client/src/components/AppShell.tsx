@@ -15,8 +15,8 @@ export function AppShell() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="sidebar-header">
-          <h2>⚙ Workflow</h2>
-          <small>{user?.full_name}</small>
+          <h2>Multi Tenant Workflow App</h2>
+          <small>{user?.fullName}</small>
         </div>
         <div className="tenant-selector">
           <TenantSelector />

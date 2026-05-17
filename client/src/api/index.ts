@@ -61,9 +61,9 @@ function buildQuery(
 
 // Auth
 export const authApi = {
-  register: (data: { email: string; password: string; full_name: string }) =>
+  register: (data: { email: string; password: string; fullName: string }) =>
     request<{
-      user: { id: string; email: string; full_name: string };
+      user: { id: string; email: string; fullName: string };
       token: string;
     }>("/auth/register", {
       method: "POST",
@@ -71,14 +71,14 @@ export const authApi = {
     }),
   login: (data: { email: string; password: string }) =>
     request<{
-      user: { id: string; email: string; full_name: string };
+      user: { id: string; email: string; fullName: string };
       token: string;
     }>("/auth/login", {
       method: "POST",
       body: data,
     }),
   me: () =>
-    request<{ id: string; email: string; full_name: string }>("/auth/profile"),
+    request<{ id: string; email: string; fullName: string }>("/auth/profile"),
 };
 
 // Tenants
@@ -105,7 +105,7 @@ export const tenantsApi = {
         user_id: string;
         role: string;
         email: string;
-        full_name: string;
+        fullName: string;
       }>;
       pagination: unknown;
     }>(`/tenants/${tenantId}/members${buildQuery(params)}`, { tenantId }),

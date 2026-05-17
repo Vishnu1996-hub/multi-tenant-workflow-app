@@ -12,7 +12,7 @@ export async function register(
 
     res.status(201).json({
       success: true,
-      data: user,
+       ...user,
     });
   } catch (error) {
     next(error);
@@ -29,7 +29,7 @@ export async function login(
 
     res.json({
       success: true,
-      data: result,
+      ...result,
     });
   } catch (error) {
     next(error);
@@ -41,13 +41,12 @@ export async function getProfile(
   res: Response,
   next: NextFunction
 ) {
-  console.log('Getting profile for userId:', req.userId);
   try {
     const user = await authService.getProfile(req.userId!);
 
     res.json({
       success: true,
-      data: user,
+      ...user,
     });
   } catch (error) {
     next(error);

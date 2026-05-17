@@ -25,7 +25,7 @@ export function DashboardPage() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '80vh' }}>
         <div style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '24px', marginBottom: '8px' }}>Welcome, {user?.full_name}!</h2>
+          <h2 style={{ fontSize: '24px', marginBottom: '8px' }}>Welcome, {user?.fullName}!</h2>
           <p style={{ color: 'var(--gray-600)' }}>Select a tenant from the sidebar to get started.</p>
         </div>
       </div>

@@ -6,7 +6,7 @@ import { ApiError } from '../api';
 
 export function MembersPage() {
   const { currentTenant } = useAuth();
-  const [result, setResult] = useState<PaginatedResult<TenantMembership & { email: string; full_name: string }> | null>(null);
+  const [result, setResult] = useState<PaginatedResult<TenantMembership & { email: string; fullName: string }> | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
 
@@ -15,7 +15,7 @@ export function MembersPage() {
     setLoading(true);
     try {
       const res = await tenantsApi.getMembers(currentTenant.id);
-      setResult(res as unknown as PaginatedResult<TenantMembership & { email: string; full_name: string }>);
+      setResult(res as unknown as PaginatedResult<TenantMembership & { email: string; fullName: string }>);
     } catch (e) {
       console.error(e);
     } finally {
@@ -62,9 +62,9 @@ export function MembersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {result?.data.map((m: TenantMembership & { email: string; full_name: string }) => (
+                  {result?.data.map((m: TenantMembership & { email: string; fullName: string }) => (
                     <tr key={m.id}>
-                      <td>{m.full_name}</td>
+                      <td>{m.fullName}</td>
                       <td className="text-gray">{m.email}</td>
                       <td>
                         <span className={`badge status-${m.role}`}>{m.role}</span>

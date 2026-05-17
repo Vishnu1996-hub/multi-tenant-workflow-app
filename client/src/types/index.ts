@@ -6,7 +6,7 @@ export type VoteDecision = 'approved' | 'rejected';
 export interface User {
   id: string;
   email: string;
-  full_name: string;
+  fullName: string;
   created_at: string;
 }
 

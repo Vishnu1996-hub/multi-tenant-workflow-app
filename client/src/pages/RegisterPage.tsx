@@ -6,7 +6,7 @@ import { ApiError } from '../api';
 export function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '', full_name: '' });
+  const [form, setForm] = useState({ email: '', password: '', fullName: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -15,7 +15,7 @@ export function RegisterPage() {
     setError('');
     setLoading(true);
     try {
-      await register(form.email, form.password, form.full_name);
+      await register(form.email, form.password, form.fullName);
       navigate('/');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Registration failed');
@@ -33,7 +33,7 @@ export function RegisterPage() {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Full Name</label>
-            <input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} required autoFocus />
+            <input value={form.fullName} onChange={e => setForm(f => ({ ...f, fullName: e.target.value }))} required autoFocus />
           </div>
           <div className="form-group">
             <label>Email</label>
