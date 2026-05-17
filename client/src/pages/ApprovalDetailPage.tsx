@@ -20,7 +20,7 @@ export function ApprovalDetailPage() {
     if (!currentTenant || !requestId) return;
     try {
       const result = await approvalsApi.get(currentTenant.id, requestId);
-      setRequest(result as ApprovalRequest);
+      setRequest((result.request ?? result) as ApprovalRequest);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Failed to load");
     } finally {

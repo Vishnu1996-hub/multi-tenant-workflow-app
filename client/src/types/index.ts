@@ -83,6 +83,7 @@ export interface ApprovalRequest {
   created_at: string;
   approval_strategy?: ApprovalStrategy;
   quorum_count?: number | null;
+  resolved_at?: string | null;
 }
 
 export interface ApprovalVote {
