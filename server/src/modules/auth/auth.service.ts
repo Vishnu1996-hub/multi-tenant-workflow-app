@@ -3,6 +3,8 @@ import { createUser, findUserByEmail, findUserById } from './auth.repository';
 import { AppError } from '../../utils/error';
 import { LoginInput, RegisterInput, AuthResponse } from './auth.types';
 import { generateToken, sanitizeUser } from './auth.utils';
+import { createAuditLog } from '../audit/audit.service';
+import { AuditAction } from '@prisma/client';
 
 export async function registerUser(data: RegisterInput) {
   const existing = await findUserByEmail(data.email);
@@ -17,6 +19,17 @@ export async function registerUser(data: RegisterInput) {
     email: data.email,
     passwordHash: hashedPassword,
     fullName: data.fullName,
+  });
+
+  await createAuditLog({
+    actorId: user.id,
+    action: AuditAction.user_registered,
+    entityType: 'user',
+    entityId: user.id,
+    afterState: {
+      email: user.email,
+      fullName: user.fullName,
+    },
   });
 
   const token = generateToken(user.id);
@@ -39,6 +52,16 @@ export async function loginUser(data: LoginInput): Promise<AuthResponse> {
   if (!isValid) {
     throw new AppError('Invalid credentials', 401);
   }
+
+  await createAuditLog({
+    actorId: user.id,
+    action: AuditAction.user_logged_in,
+    entityType: 'user',
+    entityId: user.id,
+    metadata: {
+      email: user.email,
+    },
+  });
 
   const token = generateToken(user.id);
 

@@ -5,6 +5,8 @@ import { itemRepository } from '../items/item.repository';
 import { performTransition } from '../items/item.service';
 import { RequestFilters, ResolveRequestInput } from './request.types';
 import { PaginationParams } from '../../utils/pagination';
+import { createAuditLog } from '../audit/audit.service';
+import { AuditAction } from '@prisma/client';
 
 export async function getRequests(
   tenantId: string,
@@ -55,6 +57,18 @@ export async function resolveRequest(
 
     await approvalRepository.updateStatus(requestId, decision);
 
+    await createAuditLog({
+      tenantId,
+      actorId,
+      action: AuditAction.approval_request_resolved,
+      entityType: 'approval_request',
+      entityId: requestId,
+      afterState: {
+        decision,
+      },
+    });
+
+
     if (decision === 'approved') {
       const item = await itemRepository.findById(request.itemId, tenantId);
 
@@ -66,6 +80,7 @@ export async function resolveRequest(
         tenantId,
         item,
         transition: request.transition,
+        userId: actorId,
       });
     }
 

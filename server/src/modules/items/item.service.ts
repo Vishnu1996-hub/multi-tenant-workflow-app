@@ -1,6 +1,8 @@
+import { AuditAction } from '@prisma/client';
 import { prisma } from '../../db';
 import { AppError } from '../../utils/error';
 import { PaginationParams } from '../../utils/pagination';
+import { createAuditLog } from '../audit/audit.service';
 import { itemRepository } from './item.repository';
 import {
   CreateItemInput,
@@ -36,7 +38,7 @@ export async function createItem(
     throw new AppError('Workflow initial state not found', 400);
   }
 
-  return itemRepository.create({
+  const item = await itemRepository.create({
     tenantId,
     workflowId: workflow.id,
     currentStateId: initialState.id,
@@ -45,6 +47,20 @@ export async function createItem(
     metadata: data.metadata ?? {},
     createdBy: userId,
   });
+
+  await createAuditLog({
+    tenantId,
+    actorId: userId,
+    action: AuditAction.item_created,
+    entityType: 'item',
+    entityId: item.id,
+    afterState: {
+      title: item.title,
+      stateId: initialState.id,
+    },
+  });
+
+  return item;
 }
 
 export async function getItems(tenantId: string, pagination: PaginationParams) {
@@ -173,6 +189,28 @@ export async function requestTransition(
         },
       });
 
+      await createAuditLog({
+        tenantId,
+        actorId,
+        action: AuditAction.item_transition_requested,
+        entityType: 'item',
+        entityId: item.id,
+        afterState: {
+          transitionId,
+        },
+      });
+
+      await createAuditLog({
+        tenantId,
+        actorId,
+        action: AuditAction.approval_request_created,
+        entityType: 'approval_request',
+        entityId: request.id,
+        afterState: {
+          status: request.status,
+        },
+      });
+
       return { request };
     }
 
@@ -183,6 +221,7 @@ export async function requestTransition(
       tenantId,
       item,
       transition,
+      userId: actorId,
     });
   });
 }
@@ -196,12 +235,14 @@ export type PerformTransitionParams = {
   transition: {
     toStateId: string;
   };
+  userId?: string;
 };
 
 export async function performTransition({
   tenantId,
   item,
   transition,
+  userId = '',
 }: PerformTransitionParams): Promise<TransitionResponse> {
   const updated = await itemRepository.updateState(
     item.id,
@@ -215,6 +256,17 @@ export async function performTransition({
   }
 
   const freshItem = await itemRepository.findById(item.id, tenantId);
+
+  await createAuditLog({
+    tenantId,
+    actorId: userId,
+    action: AuditAction.item_transitioned,
+    entityType: 'item',
+    entityId: freshItem?.id,
+    afterState: {
+      stateId: freshItem?.currentStateId,
+    },
+  });
 
   return { item: freshItem ?? undefined };
 }
