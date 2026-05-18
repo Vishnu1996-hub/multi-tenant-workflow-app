@@ -8,48 +8,48 @@ async function main() {
 
   const passwordHash = await bcrypt.hash("password123", 10);
 
-  const [alice, bob, charlie, diana] = await Promise.all([
+  const [ben, joe, jos, stuart] = await Promise.all([
     prisma.user.upsert({
-      where: { email: "alice@example.com" },
-      update: { fullName: "Alice Admin" },
+      where: { email: "ben@example.com" },
+      update: { fullName: "Ben Stokes" },
       create: {
-        email: "alice@example.com",
+        email: "ben@example.com",
         passwordHash,
-        fullName: "Alice Admin",
+        fullName: "Ben Stokes",
       },
     }),
     prisma.user.upsert({
-      where: { email: "bob@example.com" },
-      update: { fullName: "Bob Approver" },
+      where: { email: "joe@example.com" },
+      update: { fullName: "Joe Root" },
       create: {
-        email: "bob@example.com",
+        email: "joe@example.com",
         passwordHash,
-        fullName: "Bob Approver",
+        fullName: "Joe Root",
       },
     }),
     prisma.user.upsert({
-      where: { email: "charlie@example.com" },
-      update: { fullName: "Charlie Member" },
+      where: { email: "jos@example.com" },
+      update: { fullName: "Jos Buttler" },
       create: {
-        email: "charlie@example.com",
+        email: "jos@example.com",
         passwordHash,
-        fullName: "Charlie Member",
+        fullName: "Jos Buttler",
       },
     }),
     prisma.user.upsert({
-      where: { email: "diana@example.com" },
-      update: { fullName: "Diana Viewer" },
+      where: { email: "stuart@example.com" },
+      update: { fullName: "Stuart Broad" },
       create: {
-        email: "diana@example.com",
+        email: "stuart@example.com",
         passwordHash,
-        fullName: "Diana Viewer",
+        fullName: "Stuart Broad",
       },
     }),
   ]);
 
   console.log("Users seeded");
 
-    // -----------------------
+  // -----------------------
   // Tenant
   // -----------------------
   const tenant = await prisma.tenant.upsert({
@@ -68,10 +68,10 @@ async function main() {
   // -----------------------
   await prisma.tenantMembership.createMany({
     data: [
-      { tenantId: tenant.id, userId: alice.id, role: TenantRole.admin },
-      { tenantId: tenant.id, userId: bob.id, role: TenantRole.approver },
-      { tenantId: tenant.id, userId: charlie.id, role: TenantRole.member },
-      { tenantId: tenant.id, userId: diana.id, role: TenantRole.viewer },
+      { tenantId: tenant.id, userId: ben.id, role: TenantRole.admin },
+      { tenantId: tenant.id, userId: joe.id, role: TenantRole.approver },
+      { tenantId: tenant.id, userId: jos.id, role: TenantRole.member },
+      { tenantId: tenant.id, userId: stuart.id, role: TenantRole.viewer },
     ],
     skipDuplicates: true,
   });
@@ -95,7 +95,7 @@ async function main() {
         tenantId: tenant.id,
         name: "Document Review",
         description: "Standard document review workflow",
-        createdBy: alice.id,
+        createdBy: ben.id,
       },
     }));
 
@@ -196,7 +196,7 @@ async function main() {
       tenantId: tenant.id,
       workflowId: workflow.id,
       currentStateId: stateMap["Draft"],
-      createdBy: charlie.id,
+      createdBy: jos.id,
       title: "Employee Leave Request",
       description: "Annual leave request for June",
       metadata: {
@@ -222,7 +222,7 @@ async function main() {
       tenantId: tenant.id,
       itemId: item.id,
       transitionId: approveTransition.id,
-      requestedBy: charlie.id,
+      requestedBy: jos.id,
       status: RequestStatus.pending,
       idempotencyKey: `seed-${Date.now()}`,
     },
@@ -237,21 +237,21 @@ async function main() {
     data: [
       {
         tenantId: tenant.id,
-        actorId: alice.id,
+        actorId: ben.id,
         action: AuditAction.tenant_created,
         entityType: "Tenant",
         entityId: tenant.id,
       },
       {
         tenantId: tenant.id,
-        actorId: alice.id,
+        actorId: ben.id,
         action: AuditAction.workflow_created,
         entityType: "Workflow",
         entityId: workflow.id,
       },
       {
         tenantId: tenant.id,
-        actorId: charlie.id,
+        actorId: jos.id,
         action: AuditAction.item_created,
         entityType: "Item",
         entityId: item.id,
