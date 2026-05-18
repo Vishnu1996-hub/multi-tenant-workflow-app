@@ -40,7 +40,7 @@ export async function createTenant(
         name: tenant.name,
         slug: tenant.slug,
       },
-    });
+    }, tx);
 
     await createAuditLog({
       tenantId: tenant.id,
@@ -51,7 +51,7 @@ export async function createTenant(
       afterState: {
         role: 'admin',
       },
-    });
+    }, tx);
 
 
     return tenant;
@@ -82,7 +82,13 @@ export async function addMember(
     throw new AppError('User not found', 404);
   }
 
-const membership = await repo.addMembership(tenantId, user.id, role);
+  const existing = await repo.findMembership(tenantId, user.id);
+
+  if (existing) {
+    throw new AppError('User is already a member of this tenant', 400);
+  }
+
+  const membership = await repo.addMembership(tenantId, user.id, role);
 
   await createAuditLog({
     tenantId,

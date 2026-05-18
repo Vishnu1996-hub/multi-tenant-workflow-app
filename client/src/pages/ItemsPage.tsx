@@ -107,14 +107,14 @@ export function ItemsPage() {
                   {result.data.map(item => (
                     <tr key={item.id}>
                       <td>{item.title}</td>
-                      <td><span className="badge badge-blue">{item.workflow_name}</span></td>
+                      <td><span className="badge badge-blue">{item.workflow?.name}</span></td>
                       <td>
-                        <span className={`badge ${item.is_terminal ? 'badge-green' : 'badge-yellow'}`}>
-                          {item.current_state_name}
+                        <span className={`badge ${item.currentState?.isTerminal ? 'badge-green' : 'badge-yellow'}`}>
+                          {item.currentState?.name}
                         </span>
                       </td>
-                      <td>{item.created_by_name}</td>
-                      <td className="text-gray">{new Date(item.updated_at).toLocaleDateString()}</td>
+                      <td>{item.creator?.fullName}</td>
+                      <td className="text-gray">{new Date(item.updatedAt as string).toLocaleDateString()}</td>
                       <td>
                         <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/items/${item.id}`)}>
                           View →
@@ -163,7 +163,7 @@ function CreateItemModal({ tenantId, workflows, onClose, onCreated }: {
     if (!form.workflow_id) { setError('Select a workflow'); return; }
     setLoading(true);
     try {
-      await itemsApi.create(tenantId, { workflow_id: form.workflow_id, title: form.title, description: form.description || undefined });
+      await itemsApi.create(tenantId, { workflowId: form.workflow_id, title: form.title, description: form.description || undefined });
       onCreated();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to create item');

@@ -54,8 +54,8 @@ export function WorkflowDetailPage() {
                 }}>
                   <span>{s.name}</span>
                   <div style={{ display: 'flex', gap: '4px' }}>
-                    {s.is_initial && <span className="badge badge-blue">Initial</span>}
-                    {s.is_terminal && <span className="badge badge-green">Terminal</span>}
+                    {s.isInitial && <span className="badge badge-blue">Initial</span>}
+                    {s.isTerminal && <span className="badge badge-green">Terminal</span>}
                   </div>
                 </div>
               ))}
@@ -74,11 +74,11 @@ export function WorkflowDetailPage() {
                   <div className="text-sm text-gray">
                     {t.from_state_name} → {t.to_state_name}
                   </div>
-                  {t.requires_approval && (
+                  {t.requiresApproval && (
                     <div className="mt-2">
                       <span className="badge badge-yellow">
-                        Requires {t.approval_strategy} approval
-                        {t.approval_strategy === 'quorum' && ` (${t.quorum_count})`}
+                        Requires {t.approvalStrategy} approval
+                        {t.approvalStrategy === 'quorum' && ` (${t.quorumCount} approvers required)`}
                       </span>
                     </div>
                   )}

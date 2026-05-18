@@ -167,7 +167,7 @@ export const itemsApi = {
     }>(`/tenants/${tenantId}/items/${itemId}`, { tenantId }),
   create: (
     tenantId: string,
-    data: { workflow_id: string; title: string; description?: string },
+    data: { workflowId: string; title: string; description?: string },
   ) =>
     request(`/tenants/${tenantId}/items`, {
       method: "POST",
@@ -177,7 +177,7 @@ export const itemsApi = {
   transition: (
     tenantId: string,
     itemId: string,
-    data: { transition_id: string; version: number; idempotency_key?: string },
+    data: { transitionId: string; version: number; idempotencyKey?: string },
   ) =>
     request<{ item?: unknown; approvalRequest?: unknown }>(
       `/tenants/${tenantId}/items/${itemId}/transitions`,
@@ -193,13 +193,13 @@ export const approvalsApi = {
   ) => {
     const q = buildQuery(params);
     return request<{ data: unknown[]; pagination: unknown }>(
-      `/tenants/${tenantId}/approvals${q ? `?${q}` : ""}`,
+      `/tenants/${tenantId}/requests${q ? `${q}` : ""}`,
       { tenantId },
     );
   },
   get: (tenantId: string, requestId: string) =>
     request<{ request: unknown }>(
-      `/tenants/${tenantId}/approvals/${requestId}`,
+      `/tenants/${tenantId}/requests/${requestId}`,
       { tenantId },
     ),
   resolve: (
@@ -207,7 +207,7 @@ export const approvalsApi = {
     requestId: string,
     data: { decision: "approved" | "rejected"; comment?: string },
   ) =>
-    request(`/tenants/${tenantId}/approvals/${requestId}/resolve`, {
+    request(`/tenants/${tenantId}/requests/${requestId}/resolve`, {
       method: "POST",
       body: data,
       tenantId,

@@ -15,6 +15,6 @@ export async function getAllAuditLogs(req: Request, res: Response) {
 
   res.json({
     success: true,
-    data: result,
+    ...result,
   });
 }

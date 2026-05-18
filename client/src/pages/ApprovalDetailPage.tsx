@@ -102,9 +102,9 @@ export function ApprovalDetailPage() {
                   <td>
                     <button
                       className="btn btn-ghost btn-sm"
-                      onClick={() => navigate(`/items/${request.item_id}`)}
+                      onClick={() => navigate(`/items/${request.item?.id}`)}
                     >
-                      {request.item_title ?? request.item_id.slice(0, 8)} →
+                      {request.item?.title ?? request.item?.id.slice(0, 8)} →
                     </button>
                   </td>
                 </tr>
@@ -114,7 +114,7 @@ export function ApprovalDetailPage() {
                   </td>
                   <td>
                     <span className="badge badge-green">
-                      {request.to_state_name ?? "—"}
+                      {request.transition?.toState?.name ?? "—"}
                     </span>
                   </td>
                 </tr>
@@ -122,20 +122,20 @@ export function ApprovalDetailPage() {
                   <td style={{ padding: "6px 0", color: "var(--gray-600)" }}>
                     Requested By
                   </td>
-                  <td>{request.requester_name ?? "—"}</td>
+                  <td>{request.requester?.fullName ?? "—"}</td>
                 </tr>
                 <tr>
                   <td style={{ padding: "6px 0", color: "var(--gray-600)" }}>
                     Requested
                   </td>
-                  <td>{new Date(request.created_at).toLocaleString()}</td>
+                  <td>{new Date(request.createdAt).toLocaleString()}</td>
                 </tr>
-                {request.resolved_at && (
+                {request.resolvedAt && (
                   <tr>
                     <td style={{ padding: "6px 0", color: "var(--gray-600)" }}>
                       Resolved
                     </td>
-                    <td>{new Date(request.resolved_at).toLocaleString()}</td>
+                    <td>{new Date(request.resolvedAt).toLocaleString()}</td>
                   </tr>
                 )}
               </tbody>
@@ -190,8 +190,8 @@ export function ApprovalDetailPage() {
                 className={`alert ${request.status === "approved" ? "alert-success" : "alert-error"}`}
               >
                 This request was <strong>{request.status}</strong>
-                {request.resolved_at &&
-                  ` on ${new Date(request.resolved_at).toLocaleString()}`}
+                {request.resolvedAt &&
+                  ` on ${new Date(request.resolvedAt).toLocaleString()}`}
                 .
               </div>
             </div>

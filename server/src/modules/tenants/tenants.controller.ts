@@ -37,7 +37,7 @@ export async function getTenants(
 
     res.json({
       success: true,
-      data: tenants,
+      ...tenants,
     });
   } catch (error) {
     next(error);
@@ -99,7 +99,7 @@ export async function getTenantMembers(
 
     res.json({
       success: true,
-      data: members,
+      ...members,
     });
   } catch (error) {
     next(error);

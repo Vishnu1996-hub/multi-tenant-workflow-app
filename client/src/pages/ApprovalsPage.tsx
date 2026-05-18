@@ -81,16 +81,16 @@ export function ApprovalsPage() {
                 <tbody>
                   {result.data.map((req: ApprovalRequest) => (
                     <tr key={req.id}>
-                      <td>{req.item_title ?? req.item_id.slice(0, 8)}</td>
-                      <td>{req.requester_name ?? '—'}</td>
-                      <td>{req.to_state_name ?? '—'}</td>
-                      <td><span className="badge badge-blue">{req.approval_strategy ?? '—'}</span></td>
+                      <td>{req.item?.title ?? req.item?.id.slice(0, 8)}</td>
+                      <td>{req.requester?.fullName ?? '—'}</td>
+                      <td>{req.transition?.toState?.name ?? '—'}</td>
+                      <td><span className="badge badge-blue">{req.transition?.approvalStrategy ?? '—'}</span></td>
                       <td>
                         <span className={`badge status-${req.status}`}>{req.status}</span>
                       </td>
-                      <td className="text-gray">{new Date(req.created_at).toLocaleDateString()}</td>
+                      <td className="text-gray">{new Date(req.createdAt).toLocaleDateString()}</td>
                       <td>
-                        <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/approvals/${req.id}`)}>
+                        <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/requests/${req.id}`)}>
                           {req.status === 'pending' ? 'Review →' : 'View →'}
                         </button>
                       </td>

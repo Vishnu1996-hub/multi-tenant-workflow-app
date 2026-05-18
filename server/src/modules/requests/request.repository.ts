@@ -78,4 +78,13 @@ export const approvalRepository = {
     });
   },
 
+  findByItemId(itemId: string, tenantId: string) {
+    return prisma.request.findMany({
+      where: {
+        itemId,
+        tenantId,
+      },
+    });
+  }
+
 };

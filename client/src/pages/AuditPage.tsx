@@ -86,17 +86,17 @@ export function AuditPage() {
                   {result.data.map((log: AuditLog) => (
                     <tr key={log.id}>
                       <td className="text-gray" style={{ whiteSpace: 'nowrap' }}>
-                        {new Date(log.created_at).toLocaleString()}
+                        {new Date(log.createdAt).toLocaleString()}
                       </td>
-                      <td>{(log as { actor_name?: string }).actor_name ?? (log.actor_id ? log.actor_id.slice(0, 8) : 'System')}</td>
+                      <td>{(log.actor?.fullName ?? 'System')}</td>
                       <td>
                         <span className={`badge ${actionColors[log.action] ?? 'badge-gray'}`} style={{ fontSize: '11px' }}>
                           {log.action}
                         </span>
                       </td>
                       <td className="text-gray">
-                        {log.entity_type && <span>{log.entity_type}</span>}
-                        {log.entity_id && <span style={{ marginLeft: '4px', opacity: 0.6 }}>{log.entity_id.slice(0, 8)}</span>}
+                        {log.entityType && <span>{log.entityType}</span>}
+                        {log.entityId && <span style={{ marginLeft: '4px', opacity: 0.6 }}>{log.entityId.slice(0, 8)}</span>}
                       </td>
                       <td className="text-gray text-sm">
                         {log.metadata && Object.keys(log.metadata).length > 0 &&

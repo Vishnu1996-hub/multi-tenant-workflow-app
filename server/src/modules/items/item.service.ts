@@ -9,6 +9,8 @@ import {
   Params,
   TransitionResponse,
 } from './item.types';
+import { approvalRepository } from '../requests/request.repository';
+import { findTransitionsByFromState } from '../workflows/workflow.repository';
 
 export async function createItem(
   tenantId: string,
@@ -67,6 +69,16 @@ export async function getItems(tenantId: string, pagination: PaginationParams) {
   return itemRepository.findMany(tenantId, pagination);
 }
 
+// export async function getItem(itemId: string, tenantId: string) {
+//   const item = await itemRepository.findById(itemId, tenantId);
+
+//   if (!item) {
+//     throw new AppError('Item not found', 404);
+//   }
+
+//   return item;
+// }
+
 export async function getItem(itemId: string, tenantId: string) {
   const item = await itemRepository.findById(itemId, tenantId);
 
@@ -74,7 +86,16 @@ export async function getItem(itemId: string, tenantId: string) {
     throw new AppError('Item not found', 404);
   }
 
-  return item;
+  const [transitions, requests] = await Promise.all([
+    findTransitionsByFromState(item.currentStateId, tenantId),
+    approvalRepository.findByItemId(itemId, tenantId),
+  ]);
+
+  return {
+    item,
+    transitions,
+    requests,
+  };
 }
 
 export async function requestTransition(

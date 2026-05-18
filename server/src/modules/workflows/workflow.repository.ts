@@ -174,3 +174,17 @@ export const addTransition = (
       ...data,
     },
   });
+
+export const findTransitionsByFromState = (
+  fromStateId: string,
+  tenantId: string
+) =>
+  prisma.workflowTransition.findMany({
+    where: {
+      fromStateId,
+      tenantId,
+    },
+    include: {
+      toState: true,
+    },
+  });

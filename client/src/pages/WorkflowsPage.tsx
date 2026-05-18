@@ -86,8 +86,7 @@ export function WorkflowsPage() {
                         <span className="badge badge-gray">v{wf.version}</span>
                       </td>
                       <td>
-                        {(wf as { created_by_name?: string }).created_by_name ??
-                          "—"}
+                        {(wf.creator?.fullName ?? "—")}
                       </td>
                       <td>
                         <button
@@ -147,57 +146,57 @@ function CreateWorkflowModal({
         states: [
           {
             name: "Draft",
-            is_initial: true,
-            is_terminal: false,
-            position_order: 0,
+            isInitial: true,
+            isTerminal: false,
+            positionOrder: 0,
           },
           {
             name: "In Review",
-            is_initial: false,
-            is_terminal: false,
-            position_order: 1,
+            isInitial: false,
+            isTerminal: false,
+            positionOrder: 1,
           },
           {
             name: "Approved",
-            is_initial: false,
-            is_terminal: true,
-            position_order: 2,
+            isInitial: false,
+            isTerminal: true,
+            positionOrder: 2,
           },
           {
             name: "Rejected",
-            is_initial: false,
-            is_terminal: true,
-            position_order: 3,
+            isInitial: false,
+            isTerminal: true,
+            positionOrder: 3,
           },
         ],
         transitions: [
           {
-            from_state: "Draft",
-            to_state: "In Review",
+            fromState: "Draft",
+            toState: "In Review",
             name: "Submit",
-            requires_approval: false,
-            approval_strategy: "none",
+            requiresApproval: false,
+            approvalStrategy: "none",
           },
           {
-            from_state: "In Review",
-            to_state: "Approved",
+            fromState: "In Review",
+            toState: "Approved",
             name: "Approve",
-            requires_approval: true,
-            approval_strategy: "single",
+            requiresApproval: true,
+            approvalStrategy: "single",
           },
           {
-            from_state: "In Review",
-            to_state: "Rejected",
+            fromState: "In Review",
+            toState: "Rejected",
             name: "Reject",
-            requires_approval: true,
-            approval_strategy: "single",
+            requiresApproval: true,
+            approvalStrategy: "single",
           },
           {
-            from_state: "Rejected",
-            to_state: "Draft",
+            fromState: "Rejected",
+            toState: "Draft",
             name: "Revise",
-            requires_approval: false,
-            approval_strategy: "none",
+            requiresApproval: false,
+            approvalStrategy: "none",
           },
         ],
       });

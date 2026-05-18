@@ -10,12 +10,12 @@ export function AppShell() {
     logout();
     navigate("/login");
   };
-
+console.log('Current tenant in AppShell:', currentTenant);
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <div className="sidebar-header">
-          <h2>Multi Tenant Workflow App</h2>
+          <h2>Multi Tenant Workflow</h2>
           <small>{user?.fullName}</small>
         </div>
         <div className="tenant-selector">
@@ -30,7 +30,7 @@ export function AppShell() {
               Items
             </NavLink>
             <NavLink
-              to="/approvals"
+              to="/requests"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Approvals

@@ -8,7 +8,7 @@ import { ApiError } from "../api";
 interface ItemDetail {
   item: Item;
   transitions: WorkflowTransition[];
-  pendingApprovals: ApprovalRequest[];
+  requests: ApprovalRequest[];
 }
 
 export function ItemDetailPage() {
@@ -43,9 +43,9 @@ export function ItemDetailPage() {
     setTransitionError("");
     try {
       const result = await itemsApi.transition(currentTenant.id, itemId!, {
-        transition_id: transitionId,
+        transitionId: transitionId,
         version: detail.item.version,
-        idempotency_key: `${itemId}-${transitionId}-${Date.now()}`,
+        idempotencyKey: `${itemId}-${transitionId}-${Date.now()}`,
       });
       if ((result as { approvalRequest?: unknown }).approvalRequest) {
         await loadItem();
@@ -70,7 +70,7 @@ export function ItemDetailPage() {
     );
   if (!detail) return null;
 
-  const { item, transitions, pendingApprovals } = detail;
+  const { item, transitions, requests } = detail;
 
   return (
     <>
@@ -86,10 +86,10 @@ export function ItemDetailPage() {
           <h1>{item.title}</h1>
         </div>
         <span
-          className={`badge ${item.is_terminal ? "badge-green" : "badge-yellow"}`}
+          className={`badge ${item.currentState.isTerminal ? "badge-green" : "badge-yellow"}`}
           style={{ fontSize: "14px", padding: "4px 12px" }}
         >
-          {item.current_state_name}
+          {item.currentState.name}
         </span>
       </div>
       <div className="page-body">
@@ -116,7 +116,7 @@ export function ItemDetailPage() {
                     </td>
                     <td>
                       <span className="badge badge-blue">
-                        {item.workflow_name}
+                        {item.workflow?.name ?? "—"}
                       </span>
                     </td>
                   </tr>
@@ -124,13 +124,13 @@ export function ItemDetailPage() {
                     <td style={{ padding: "6px 0", color: "var(--gray-600)" }}>
                       Created by
                     </td>
-                    <td>{item.created_by_name}</td>
+                    <td>{item.creator.fullName}</td>
                   </tr>
                   <tr>
                     <td style={{ padding: "6px 0", color: "var(--gray-600)" }}>
                       Created
                     </td>
-                    <td>{new Date(item.created_at).toLocaleString()}</td>
+                    <td>{new Date(item.createdAt as string).toLocaleString()}</td>
                   </tr>
                   <tr>
                     <td style={{ padding: "6px 0", color: "var(--gray-600)" }}>
@@ -142,10 +142,10 @@ export function ItemDetailPage() {
               </table>
             </div>
 
-            {pendingApprovals.length > 0 && (
+            {requests.length > 0 && (
               <div className="card mt-4">
-                <div className="card-title">⏳ Pending Approvals</div>
-                {pendingApprovals.map((apr: ApprovalRequest) => (
+                <div className="card-title">⏳ Pending Requests</div>
+                {requests.map((apr: ApprovalRequest) => (
                   <div key={apr.id} style={{ marginBottom: "8px" }}>
                     <div className="flex items-center justify-between">
                       <span className="badge status-pending">
@@ -153,13 +153,13 @@ export function ItemDetailPage() {
                       </span>
                       <button
                         className="btn btn-ghost btn-sm"
-                        onClick={() => navigate(`/approvals/${apr.id}`)}
+                        onClick={() => navigate(`/requests/${apr.id}`)}
                       >
                         Review →
                       </button>
                     </div>
                     <div className="text-sm text-gray mt-2">
-                      Requested {new Date(apr.created_at).toLocaleString()}
+                      Requested {new Date(apr.createdAt).toLocaleString()}
                     </div>
                   </div>
                 ))}
@@ -194,14 +194,14 @@ export function ItemDetailPage() {
                   >
                     <div>
                       <div style={{ fontWeight: "500" }}>
-                        {t.name ?? `→ ${t.to_state_name}`}
+                        {t.name ?? `→ ${t.toState?.name}`}
                       </div>
                       <div
                         className="text-sm text-gray"
                         style={{ marginTop: "2px" }}
                       >
-                        To: <strong>{t.to_state_name}</strong>
-                        {t.requires_approval && (
+                        To: <strong>{t.toState?.name}</strong>
+                        {t.requiresApproval && (
                           <span
                             className="text-xs"
                             style={{
@@ -216,7 +216,7 @@ export function ItemDetailPage() {
                     </div>
                     <button
                       className={`btn btn-sm btn-primary`}
-                      disabled={transitioning || pendingApprovals.length > 0}
+                      disabled={transitioning || requests.length > 0}
                       onClick={() => handleTransition(t.id)}
                     >
                       {transitioning ? "..." : "Execute"}
@@ -225,7 +225,7 @@ export function ItemDetailPage() {
                 ))}
               </div>
             )}
-            {pendingApprovals.length > 0 && (
+            {requests.length > 0 && (
               <div className="alert alert-info mt-4">
                 Transitions are locked while an approval request is pending.
               </div>

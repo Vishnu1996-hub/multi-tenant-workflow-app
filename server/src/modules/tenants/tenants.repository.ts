@@ -37,13 +37,24 @@ export const addMembership = (
   });
 };
 
+export const findMembership = (tenantId: string, userId: string) => {
+  return prisma.tenantMembership.findUnique({
+    where: {
+      tenantId_userId: {
+        tenantId,
+        userId,
+      },
+    },
+  });
+};
+
 export const getUserTenants = async (
   userId: string,
   params: PaginationParams
 ) => {
   const { skip, take } = paginationToPrisma(params);
 
-  const [data, total] = await Promise.all([
+  const [memberships, total] = await Promise.all([
     prisma.tenantMembership.findMany({
       where: { userId },
       include: {
@@ -52,13 +63,20 @@ export const getUserTenants = async (
       skip,
       take,
       orderBy: {
-        createdAt: 'desc',
+        tenant: {
+          name: 'asc',
+        },
       },
     }),
     prisma.tenantMembership.count({
       where: { userId },
     }),
   ]);
+
+  const data = memberships.map((membership) => ({
+    ...membership.tenant,
+    role: membership.role,
+  }));
 
   return buildPaginatedResult(data, total, params);
 };

@@ -36,8 +36,8 @@ export function App() {
             <Route index element={<DashboardPage />} />
             <Route path="items" element={<ItemsPage />} />
             <Route path="items/:itemId" element={<ItemDetailPage />} />
-            <Route path="approvals" element={<ApprovalsPage />} />
-            <Route path="approvals/:requestId" element={<ApprovalDetailPage />} />
+            <Route path="requests" element={<ApprovalsPage />} />
+            <Route path="requests/:requestId" element={<ApprovalDetailPage />} />
             <Route path="workflows" element={<WorkflowsPage />} />
             <Route path="workflows/:workflowId" element={<WorkflowDetailPage />} />
             <Route path="audit" element={<AuditPage />} />

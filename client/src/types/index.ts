@@ -7,16 +7,18 @@ export interface User {
   id: string;
   email: string;
   fullName: string;
-  created_at: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface TenantMembership {
   id: string;
-  tenant_id: string;
-  user_id: string;
+  tenantId: string;
+  userId: string;
   role: TenantRole;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
+  user: User;
 }
 
 export interface Tenant {
@@ -30,60 +32,93 @@ export interface WorkflowState {
   id: string;
   workflow_id: string;
   name: string;
-  is_initial: boolean;
-  is_terminal: boolean;
-  position_order: number;
+  isInitial: boolean;
+  isTerminal: boolean;
+  positionOrder: number;
 }
+
+export interface CurrentState {
+  id: string;
+  workflowId: string;
+  tenantId: string;
+  name: string;
+  description?: string;
+  isInitial: boolean;
+  isTerminal: boolean;
+  positionOrder: number;
+  createdAt: string;
+};
 
 export interface WorkflowTransition {
   id: string;
   workflow_id: string;
-  from_state_id: string;
-  to_state_id: string;
-  to_state_name?: string;
+  fromStateId: string;
+  toStateId: string;
+  toStateName?: string;
   name: string | null;
-  requires_approval: boolean;
-  approval_strategy: ApprovalStrategy;
-  quorum_count: number | null;
+  requiresApproval: boolean;
+  approvalStrategy: ApprovalStrategy;
+  quorumCount: number | null;
+  toState?: CurrentState;
+  fromState?: CurrentState;
 }
 
 export interface Workflow {
   id: string;
+  tenantId: string;
   name: string;
   description: string | null;
   version: number;
-  is_active: boolean;
-  created_by_name?: string;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  creator?: User;
 }
 
 export interface Item {
   id: string;
+  tenantId: string;
+  workflowId: string;
+  currentStateId: string;
+  createdBy: string;
   title: string;
   description: string | null;
-  current_state_id: string;
-  current_state_name: string;
-  is_terminal?: boolean;
-  workflow_id: string;
-  workflow_name: string;
-  created_by_name: string;
+  metadata: Record<string, unknown>;
   version: number;
-  created_at: string;
-  updated_at: string;
+  createdAt?: string;
+  updatedAt?: string;
+  workflow: Workflow;
+  currentState: CurrentState;
+  creator: User;
 }
+
+// export interface ApprovalRequest {
+//   id: string;
+//   itemId: string;
+//   itemTitle?: string;
+//   transitionId: string;
+//   toStateName?: string;
+//   requestedBy: string;
+//   requesterName?: string;
+//   status: ApprovalStatus;
+//   createdAt: string;
+//   approvalStrategy?: ApprovalStrategy;
+//   quorumCount?: number | null;
+//   resolvedAt?: string | null;
+// }
 
 export interface ApprovalRequest {
   id: string;
-  item_id: string;
-  item_title?: string;
-  transition_id: string;
-  to_state_name?: string;
-  requested_by: string;
-  requester_name?: string;
+  item: Item;
+  transition: WorkflowTransition;
+  requester: User;
   status: ApprovalStatus;
-  created_at: string;
-  approval_strategy?: ApprovalStrategy;
-  quorum_count?: number | null;
-  resolved_at?: string | null;
+  createdAt: string;
+  approvalStrategy?: ApprovalStrategy;
+  quorumCount?: number | null;
+  resolvedAt?: string | null;
+  votes?: ApprovalVote[];
 }
 
 export interface ApprovalVote {
@@ -100,12 +135,11 @@ export interface ApprovalVote {
 export interface AuditLog {
   id: string;
   action: string;
-  actor_id: string | null;
-  actor_name?: string;
-  entity_type: string | null;
-  entity_id: string | null;
+  entityType: string | null;
+  entityId: string | null;
   metadata: Record<string, unknown>;
-  created_at: string;
+  createdAt: string;
+  actor?: User;
 }
 
 export interface PaginatedResult<T> {

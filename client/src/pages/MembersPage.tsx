@@ -64,16 +64,16 @@ export function MembersPage() {
                 <tbody>
                   {result?.data.map((m: TenantMembership & { email: string; fullName: string }) => (
                     <tr key={m.id}>
-                      <td>{m.fullName}</td>
-                      <td className="text-gray">{m.email}</td>
+                      <td>{m.user.fullName}</td>
+                      <td className="text-gray">{m.user.email}</td>
                       <td>
                         <span className={`badge status-${m.role}`}>{m.role}</span>
                       </td>
-                      <td className="text-gray">{new Date(m.created_at).toLocaleDateString()}</td>
+                      <td className="text-gray">{new Date(m.createdAt).toLocaleDateString()}</td>
                       <td>
                         <select
                           value={m.role}
-                          onChange={e => handleRoleChange(m.user_id, e.target.value)}
+                          onChange={e => handleRoleChange(m.userId, e.target.value)}
                           style={{ padding: '4px 8px', border: '1px solid var(--gray-200)', borderRadius: '4px', fontSize: '12px' }}
                         >
                           <option value="admin">Admin</option>

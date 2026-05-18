@@ -113,7 +113,13 @@ export async function getWorkflow(
         throw new AppError('Workflow not found', 404);
     }
 
-    return workflow;
+    const {states, transitions, ...rest} = workflow;
+
+    return {
+        workflow: rest,
+        states,
+        transitions
+    };
 }
 
 export const addState = async (

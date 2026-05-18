@@ -8,7 +8,7 @@ import workflowsRouter from './modules/workflows/workflow.router';
 import itemRouter from './modules/items/item.router';
 import requestsRouter from './modules/requests/request.router';
 import { httpLogger } from './middleware/logger';
-
+import auditRouter from './modules/audit/audit.router'
 const app = express();
 
 app.use(httpLogger);
@@ -30,6 +30,7 @@ app.use('/api/tenants', tenantsRoutes);
 app.use('/api/tenants/:tenantId/workflows', workflowsRouter);
 app.use('/api/tenants/:tenantId/items', itemRouter);
 app.use("/api/tenants/:tenantId/requests", requestsRouter);
+app.use("/api/tenants/:tenantId/audit", auditRouter);
 
 app.use(errorHandler);
 
