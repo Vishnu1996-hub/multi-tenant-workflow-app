@@ -23,6 +23,20 @@ console.log('Current tenant in AppShell:', currentTenant);
         </div>
         {currentTenant && (
           <nav className="sidebar-nav">
+            {currentTenant.role === "admin" && (
+              <NavLink
+                to="/members"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Members
+              </NavLink>
+            )}
+            <NavLink
+              to="/workflows"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Workflows
+            </NavLink>
             <NavLink
               to="/items"
               className={({ isActive }) => (isActive ? "active" : "")}
@@ -36,25 +50,11 @@ console.log('Current tenant in AppShell:', currentTenant);
               Approvals
             </NavLink>
             <NavLink
-              to="/workflows"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Workflows
-            </NavLink>
-            <NavLink
               to="/audit"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Audit Log
             </NavLink>
-            {currentTenant.role === "admin" && (
-              <NavLink
-                to="/members"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                Members
-              </NavLink>
-            )}
           </nav>
         )}
         <div className="sidebar-footer">

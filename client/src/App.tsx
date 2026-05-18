@@ -16,8 +16,25 @@ import { MembersPage } from './pages/MembersPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
+
   if (isLoading) return <div className="loading">Loading...</div>;
-  if (!user) return <Navigate to="/login" replace />;
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) return <div className="loading">Loading...</div>;
+
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
+
   return <>{children}</>;
 }
 
@@ -26,13 +43,34 @@ export function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/" element={
-            <ProtectedRoute>
-              <AppShell />
-            </ProtectedRoute>
-          }>
+          {/* Public Routes */}
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
+
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
+            }
+          />
+
+          {/* Protected Routes */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AppShell />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<DashboardPage />} />
             <Route path="items" element={<ItemsPage />} />
             <Route path="items/:itemId" element={<ItemDetailPage />} />
@@ -43,6 +81,8 @@ export function App() {
             <Route path="audit" element={<AuditPage />} />
             <Route path="members" element={<MembersPage />} />
           </Route>
+
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

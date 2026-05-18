@@ -28,8 +28,8 @@ export function LoginPage() {
   return (
     <div className="auth-container">
       <div className="auth-box card">
-        <h1>Multi Tenant Workflow App</h1>
-        <p>Sign in to your account</p>
+        <h1>Login</h1>
+        <p>Sign in for Multi Tenant Workflow App</p>
         {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -47,13 +47,13 @@ export function LoginPage() {
         <p className="text-sm text-gray mt-4" style={{ textAlign: 'center' }}>
           Don't have an account? <Link to="/register" style={{ color: 'var(--primary)' }}>Register</Link>
         </p>
-        <div className="alert alert-info mt-4" style={{ fontSize: '12px' }}>
+        {/* <div className="alert alert-info mt-4" style={{ fontSize: '12px' }}>
           <strong>Demo accounts:</strong><br />
           ben@example.com / password123 (admin)<br />
           joe@example.com / password123 (approver)<br />
           jos@example.com / password123 (member)<br />
           stuart@example.com / password123 (viewer)
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -44,7 +44,7 @@ export function DashboardPage() {
             <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--primary)' }}>{stats.items}</div>
             <div className="text-gray text-sm">Total Items</div>
           </div>
-          <div className="card" style={{ cursor: 'pointer' }} onClick={() => navigate('/approvals?status=pending')}>
+          <div className="card" style={{ cursor: 'pointer' }} onClick={() => navigate('/requests?status=pending')}>
             <div style={{ fontSize: '32px', fontWeight: '700', color: stats.pendingApprovals > 0 ? 'var(--warning)' : 'var(--gray-400)' }}>
               {stats.pendingApprovals}
             </div>
