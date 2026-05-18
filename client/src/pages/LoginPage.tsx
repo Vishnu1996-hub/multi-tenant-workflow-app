@@ -49,9 +49,10 @@ export function LoginPage() {
         </p>
         <div className="alert alert-info mt-4" style={{ fontSize: '12px' }}>
           <strong>Demo accounts:</strong><br />
-          alice@example.com / password123 (admin)<br />
-          bob@example.com / password123 (approver)<br />
-          charlie@example.com / password123 (member)
+          ben@example.com / password123 (admin)<br />
+          joe@example.com / password123 (approver)<br />
+          jos@example.com / password123 (member)<br />
+          stuart@example.com / password123 (viewer)
         </div>
       </div>
     </div>
