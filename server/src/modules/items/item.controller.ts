@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as itemService from './item.service';
+import { parsePagination } from '../../utils/pagination';
 
 export async function createItem(req: Request, res: Response) {
   const item = await itemService.createItem(
@@ -12,7 +13,8 @@ export async function createItem(req: Request, res: Response) {
 }
 
 export async function getItems(req: Request, res: Response) {
-  const items = await itemService.getItems(req.tenantId!);
+  const pagination = parsePagination(req);
+  const items = await itemService.getItems(req.tenantId!, pagination);
   res.json(items);
 }
 

@@ -1,5 +1,6 @@
 import { prisma } from '../../db';
 import { AppError } from '../../utils/error';
+import { PaginationParams } from '../../utils/pagination';
 import { itemRepository } from './item.repository';
 import {
   CreateItemInput,
@@ -46,8 +47,8 @@ export async function createItem(
   });
 }
 
-export async function getItems(tenantId: string) {
-  return itemRepository.findMany(tenantId);
+export async function getItems(tenantId: string, pagination: PaginationParams) {
+  return itemRepository.findMany(tenantId, pagination);
 }
 
 export async function getItem(itemId: string, tenantId: string) {

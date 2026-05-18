@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as tenantService from './tenants.service';
+import { parsePagination } from '../../utils/pagination';
+
 
 export async function createTenant(
   req: Request,
@@ -30,7 +32,8 @@ export async function getTenants(
   next: NextFunction
 ) {
   try {
-    const tenants = await tenantService.getTenants(req.userId!);
+    const pagination = parsePagination(req);
+    const tenants = await tenantService.getTenants(req.userId!, pagination);
 
     res.json({
       success: true,
@@ -87,8 +90,11 @@ export async function getTenantMembers(
   next: NextFunction
 ) {
   try {
+    const pagination = parsePagination(req);
+
     const members = await tenantService.getTenantMembers(
-      req.params.tenantId as string
+      req.params.tenantId as string,
+      pagination
     );
 
     res.json({

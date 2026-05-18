@@ -7,6 +7,7 @@ import {
   WorkflowStateInput,
   WorkflowTransitionInput,
 } from './workflow.types';
+import { buildPaginatedResult, PaginationParams, paginationToPrisma } from '../../utils/pagination';
 
 type Tx = Prisma.TransactionClient;
 
@@ -93,20 +94,42 @@ export async function createTransitions(
   return created;
 }
 
-export const findAllByTenant = (tenantId: string) =>
-  prisma.workflow.findMany({
-    where: { tenantId, isActive: true },
-    include: {
-      creator: {
-        select: {
-          id: true,
-          fullName: true,
-          email: true,
+export const findAllByTenant = async (
+  tenantId: string,
+  pagination: PaginationParams
+) => {
+  const { skip, take } = paginationToPrisma(pagination);
+
+  const where = {
+    tenantId,
+    isActive: true,
+  };
+
+  const [data, total] = await Promise.all([
+    prisma.workflow.findMany({
+      where,
+      include: {
+        creator: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
         },
       },
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip,
+      take,
+    }),
+    prisma.workflow.count({
+      where,
+    }),
+  ]);
+
+  return buildPaginatedResult(data, total, pagination);
+};
 
 export const findById = (
   tenantId: string,

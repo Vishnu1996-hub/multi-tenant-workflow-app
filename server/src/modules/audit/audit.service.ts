@@ -1,3 +1,4 @@
+import { PaginationParams } from '../../utils/pagination';
 import { auditRepository } from './audit.repository';
 import { CreateAuditLogInput, AuditFilters } from './audit.types';
 
@@ -21,7 +22,8 @@ export async function createAuditLog(data: CreateAuditLogInput) {
 
 export async function getAuditLogs(
   tenantId: string,
-  filters: AuditFilters
+  filters: AuditFilters,
+  pagination: PaginationParams
 ) {
-  return auditRepository.findMany(tenantId, filters);
+  return auditRepository.findMany(tenantId, filters, pagination);
 }

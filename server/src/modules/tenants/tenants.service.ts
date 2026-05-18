@@ -1,5 +1,6 @@
 import { prisma } from '../../db';
 import { AppError } from '../../utils/error';
+import { PaginationParams } from '../../utils/pagination';
 import * as repo from './tenants.repository';
 import { TenantRole } from './tenants.types';
 
@@ -31,8 +32,8 @@ export async function createTenant(
   });
 }
 
-export async function getTenants(userId: string) {
-  return repo.getUserTenants(userId);
+export async function getTenants(userId: string, pagination: PaginationParams) {
+  return repo.getUserTenants(userId, pagination);
 }
 
 export async function getTenantById(tenantId: string) {
@@ -57,8 +58,8 @@ export async function addMember(
   return repo.addMembership(tenantId, user.id, role);
 }
 
-export async function getTenantMembers(tenantId: string) {
-  return repo.getMembershipsByTenantId(tenantId);
+export async function getTenantMembers(tenantId: string, pagination: PaginationParams) {
+  return repo.getMembershipsByTenantId(tenantId, pagination);
 }
 
 export async function updateMemberRole(

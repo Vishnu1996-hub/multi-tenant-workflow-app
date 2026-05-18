@@ -1,4 +1,5 @@
 import { prisma } from '../../db';
+import { buildPaginatedResult, PaginationParams, paginationToPrisma } from '../../utils/pagination';
 
 export const itemRepository = {
   create(data: any, tx = prisma) {
@@ -19,9 +20,14 @@ export const itemRepository = {
     });
   },
 
-  findMany(tenantId: string) {
-    return prisma.item.findMany({
-      where: { tenantId },
+  async findMany(tenantId: string, pagination: PaginationParams, tx = prisma) {
+    const { skip, take } = paginationToPrisma(pagination);
+
+  const where = { tenantId };
+
+  const [data, total] = await Promise.all([
+    tx.item.findMany({
+      where,
       include: {
         workflow: true,
         currentState: true,
@@ -30,7 +36,15 @@ export const itemRepository = {
       orderBy: {
         createdAt: 'desc',
       },
-    });
+      skip,
+      take,
+    }),
+    tx.item.count({
+      where,
+    }),
+  ]);
+
+  return buildPaginatedResult(data, total, pagination);
   },
 
   findTransition(

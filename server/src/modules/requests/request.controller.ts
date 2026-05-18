@@ -1,11 +1,16 @@
 import { Request, Response } from 'express';
 import * as service from './request.service';
+import { parsePagination } from '../../utils/pagination';
 
 export async function getRequests(req: Request, res: Response) {
-  const result = await service.getRequests(req.tenantId!, {
-    itemId: req.query.itemId as string,
-    status: req.query.status as string,
-  });
+  const pagination = parsePagination(req);
+  const result = await service.getRequests(
+    req.tenantId!, {
+      itemId: req.query.itemId as string,
+      status: req.query.status as string,
+    }, 
+    pagination
+  );
 
   res.json(result);
 }

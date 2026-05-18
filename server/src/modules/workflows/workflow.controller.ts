@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as service from './workflow.service';
+import { parsePagination } from '../../utils/pagination';
 
 export async function createWorkflow(
   req: Request,
@@ -26,7 +27,8 @@ export async function getWorkflows(
   next: NextFunction
 ) {
   try {
-    const result = await service.getWorkflows(req.tenantId!);
+    const pagination = parsePagination(req);
+    const result = await service.getWorkflows(req.tenantId!, pagination);
     res.json(result);
   } catch (error) {
     next(error);

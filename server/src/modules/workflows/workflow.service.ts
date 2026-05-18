@@ -8,6 +8,7 @@ import {
     AddStatePayload,
     AddTransitionPayload,
 } from './workflow.types';
+import { PaginationParams } from '../../utils/pagination';
 
 export async function createWorkflow(
     tenantId: string,
@@ -56,8 +57,8 @@ export async function createWorkflow(
     });
 }
 
-export const getWorkflows = (tenantId: string) =>
-    repo.findAllByTenant(tenantId);
+export const getWorkflows = (tenantId: string, pagination: PaginationParams) =>
+    repo.findAllByTenant(tenantId, pagination);
 
 export async function getWorkflow(
     tenantId: string,

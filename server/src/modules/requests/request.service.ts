@@ -4,12 +4,15 @@ import { approvalRepository } from './request.repository';
 import { itemRepository } from '../items/item.repository';
 import { performTransition } from '../items/item.service';
 import { RequestFilters, ResolveRequestInput } from './request.types';
+import { PaginationParams } from '../../utils/pagination';
 
 export async function getRequests(
   tenantId: string,
-  filters: RequestFilters
+  filters: RequestFilters,
+  pagination: PaginationParams  
+
 ) {
-  return approvalRepository.findMany(tenantId, filters);
+  return approvalRepository.findMany(tenantId, filters, pagination);
 }
 
 export async function getRequest(
