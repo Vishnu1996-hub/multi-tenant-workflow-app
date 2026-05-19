@@ -148,6 +148,68 @@ http://localhost:5173
 
 ---
 
+# Backend Project Structure
+
+The backend follows a modular feature-based architecture for maintainability and scalability.
+
+```text
+server/
+├── prisma/
+│   ├── schema.prisma        # Prisma database schema
+│   ├── migrations/          # Database migrations
+│   └── seed.ts              # Seed data script
+│
+├── src/
+│   ├── config/              # Environment and app configuration
+│   ├── db/                  # Prisma client setup
+│   ├── middleware/          # Express middlewares
+│   ├── modules/             # Feature modules
+│   │   ├── auth/            # Authentication
+│   │   ├── tenants/         # Tenant management
+│   │   ├── members/         # Tenant members
+│   │   ├── workflows/       # Workflow definitions
+│   │   ├── items/           # Workflow items
+│   │   ├── requests/        # Approval requests
+│   │   └── audit/           # Audit logs
+│   │
+│   ├── utils/               # Shared utilities
+│   ├── app.ts               # Express app setup
+│   └── server.ts            # Entry point
+│
+├── package.json
+└── tsconfig.json
+```
+
+## Backend Architecture Overview
+
+The backend is organized using a **layered modular architecture**:
+
+### Controller Layer
+Handles HTTP requests and responses.
+
+### Service Layer
+Contains business logic and workflow processing.
+
+### Repository Layer
+Handles database operations through Prisma ORM.
+
+### Middleware Layer
+Includes:
+
+- Authentication middleware
+- Error handling
+- Request validation
+- Tenant context handling
+
+### Utility Layer
+Contains reusable helpers such as:
+
+- Pagination
+- Error classes
+- Logger
+- Validation helpers
+
+
 # Features
 
 - Multi-tenant architecture
